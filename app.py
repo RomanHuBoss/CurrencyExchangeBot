@@ -41,7 +41,7 @@ def send_vocabulary(message):
     bot.send_message(message.chat.id, API.get_vocabulary())
 
 @bot.message_handler(commands=['rates'])
-def send_vocabulary(message):
+def send_rates(message):
     """
     отправка курсов валют
     :param message: object
