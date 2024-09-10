@@ -65,18 +65,6 @@ class API:
         обработчик запроса к боту на получение информации о словаре валют
         :return: str
         """
-
-        def align_and_pad(txt: str, width=45, filler=' ', align='c'):
-            """
-            функция выравнивает строку, дополняя ее нужным числом заданных символов
-            :param txt: исходная строка
-            :param width: ширина конечной строки
-            :param filler: символ для заполнения
-            :param align: выравнивание (l - слева, r - справа, c - по центру)
-            :return: str
-            """
-            return {'l': txt.ljust, 'c': txt.center, 'r': txt.rjust}[align](width, filler)
-
         try:
             rows = []
 
@@ -97,6 +85,33 @@ class API:
         except APIException as e:
             return (f"{e}")
 
+    @staticmethod
+    def get_rates():
+        """
+        обработчик запроса к боту на получение информации о курсах валют к рублю
+        :return: str
+        """
+
+        try:
+            rows = []
+
+            if not hasattr(API, 'storage'):
+                API.storage = RatesStorage()
+
+            rows.append(f'КОТИРОВКИ ВАЛЮТ ЦБ РФ на {API.storage.cached_date}')
+            rows.append('(Код валюты, курс руб/ед.)')
+            rows.append('-----------------------------------------------------------')
+
+            for item in API.storage.data:
+                rows.append(f"{item['code']}, {item['rub_rate']}")
+
+            rows.append('-----------------------------------------------------------')
+            rows.append("Чтобы вывести справку, наберите /start или /help")
+            return "\n".join(rows)
+
+        except APIException as e:
+            return (f"{e}")
+
 
 class RatesStorage:
     """
@@ -106,6 +121,7 @@ class RatesStorage:
         self._data_write_only = []
         self._data_read_only = []
         self._cached_date = None
+        self.fill()
 
     @staticmethod
     def current_date() -> str:
@@ -114,6 +130,10 @@ class RatesStorage:
         :return: str
         """
         return datetime.now().strftime("%d/%m/%Y")
+
+    @property
+    def cached_date(self):
+        return self._cached_date
 
     @property
     def data(self):
@@ -172,6 +192,7 @@ class RatesStorage:
         """
         self.reset()
         self._cached_date = RatesStorage.current_date()
+
         requested_url = f"{RATES_URL_PREFIX}{self._cached_date}"
         vocabulary = RatesStorage.get_vocabulary()
 

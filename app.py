@@ -18,7 +18,9 @@ def send_welcome(message):
 
 1) Введите команду /values, чтобы ознакомиться со справочником валют.
 
-2) Чтобы узнать, какую сумму в конвертируемой валюте надо потратить для приобретения целевой валюты, введите следующую команду:
+2) Введите команду /rates, чтобы ознакомиться с курсами валют.
+
+3) Чтобы узнать, какую сумму в конвертируемой валюте надо потратить для приобретения целевой валюты, введите следующую команду:
 
 <целевая валюта> <конвертируемая валюта> <сумма в целевой валюте>
 
@@ -37,6 +39,15 @@ def send_vocabulary(message):
     :return: None
     """
     bot.send_message(message.chat.id, API.get_vocabulary())
+
+@bot.message_handler(commands=['rates'])
+def send_vocabulary(message):
+    """
+    отправка курсов валют
+    :param message: object
+    :return: None
+    """
+    bot.send_message(message.chat.id, API.get_rates())
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
